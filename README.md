@@ -6,6 +6,9 @@
 ![LLM](https://img.shields.io/badge/LLM-Qwen3--4B%20(GGUF)-purple)
 ![Runtime](https://img.shields.io/badge/推理-llama.cpp%20Vulkan-green)
 
+**仓库地址**：GitHub · <https://github.com/mw2wbyys6t-sudo/doudizhu-ai> ｜ GitCode · <https://gitcode.com/gcw_VNt8FmMN/121>
+
+
 ## 这是什么
 
 一个**完全跑在你自己电脑上**的 AI 斗地主游戏：
