@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>欢乐斗地主 · 本地大模型 AI 版</title>
+<style>
+  :root{
+    --bg:#0f1a14; --panel:#16241c; --line:#24382c; --fg:#e8f0ea; --muted:#9ab0a2;
+    --gold:#e6b84c; --green:#43c97b; --accent:#4ea1ff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--fg);font-family:"Microsoft YaHei",system-ui,sans-serif;line-height:1.75;padding:40px 16px}
+  .wrap{max-width:900px;margin:0 auto}
+  header{text-align:center;padding:36px 20px 28px;background:linear-gradient(160deg,#1b3a28,#122419);border:1px solid var(--line);border-radius:16px;margin-bottom:28px}
+  h1{font-size:30px;letter-spacing:2px}
+  h1 .em{color:var(--gold)}
+  .tagline{color:var(--muted);margin-top:10px;font-size:15px}
+  .badges{margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+  .badge{background:#0c1712;border:1px solid var(--line);border-radius:999px;padding:4px 14px;font-size:12.5px;color:var(--green)}
+  h2{font-size:20px;margin:34px 0 14px;padding-left:12px;border-left:4px solid var(--gold)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px 24px;margin-bottom:14px}
+  ul.feat{list-style:none}
+  ul.feat li{padding:7px 0 7px 26px;position:relative}
+  ul.feat li::before{content:"♦";position:absolute;left:4px;color:var(--green)}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{border:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top}
+  th{background:#1b2e23;color:var(--gold);font-weight:600;white-space:nowrap}
+  td .n{display:inline-block;background:#0c1712;border:1px solid var(--line);color:var(--accent);border-radius:6px;padding:0 8px;margin-right:6px;font-size:12px}
+  code,.path{background:#0c1712;border:1px solid var(--line);border-radius:6px;padding:1px 8px;font-family:Consolas,monospace;font-size:13px;color:#ffd98a}
+  pre{background:#0c1712;border:1px solid var(--line);border-radius:10px;padding:16px 18px;overflow-x:auto;font-family:Consolas,monospace;font-size:13px;color:#cfe8d6;margin:10px 0}
+  .tip{background:#1b2e23;border:1px dashed var(--gold);border-radius:10px;padding:12px 16px;font-size:14px;margin-top:12px}
+  .dl{display:inline-block;background:linear-gradient(135deg,#e6b84c,#c9992e);color:#1a1206;font-weight:700;text-decoration:none;border-radius:10px;padding:10px 22px;margin-top:6px}
+  footer{text-align:center;color:var(--muted);font-size:13px;margin:40px 0 10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>🃏 欢乐斗地主 · <span class="em">本地大模型 AI 版</span></h1>
+    <p class="tagline">AI 叫地主 · AI 出牌 · AI 骚话 —— 全部由跑在你自己电脑上的 Qwen3-4B 驱动，免安装、点开即玩</p>
+    <div class="badges">
+      <span class="badge">Python 3.13 (embedded)</span>
+      <span class="badge">Qwen3-4B GGUF</span>
+      <span class="badge">llama.cpp Vulkan</span>
+      <span class="badge">离线运行 · 数据不出本机</span>
+    </div>
+  </header>
+
+  <h2>这是什么</h2>
+  <div class="card">
+    <ul class="feat">
+      <li><b>两个 AI 对手由本地大模型驱动</b>——叫地主决策、出牌策略、牌桌"骚话"全部由 Qwen3-4B（GGUF 量化版）推理产生，不联网、不调用云端 API。</li>
+      <li><b>规则引擎 100% 兜底</b>——代码先枚举所有合法出牌，模型只做策略选择；模型掉线时自动降级为启发式 AI，永不卡死。</li>
+      <li><b>Token 积分下注</b>——开局选底注（50/100/200/500），结算 = <code>底注 × 叫分 × 倍数</code>（炸弹/王炸/春天翻倍），积分持久化到 <code>wallet.json</code>。</li>
+      <li><b>免安装点开即玩</b>——整合包内嵌 Python 运行时与 llama.cpp（Vulkan），解压双击一个 bat 即可开玩。</li>
+    </ul>
+  </div>
+
+  <h2>一键下载 · 自动发布内容</h2>
+  <div class="card">
+    <p style="color:var(--muted);margin-bottom:12px">打包发布时以下内容全部自动化，用户只需双击一个脚本：</p>
+    <table>
+      <tr><th>#</th><th>自动发布内容</th><th>说明</th><th>触发时机</th></tr>
+      <tr><td><span class="n">1</span></td><td>内嵌 Python 3.13 运行时</td><td>免安装，无需用户安装 Python</td><td>解压即用</td></tr>
+      <tr><td><span class="n">2</span></td><td>llama.cpp 推理服务</td><td>Vulkan 版，有 N 卡自动 GPU 加速</td><td>已打进整合包</td></tr>
+      <tr><td><span class="n">3</span></td><td><b>AI 大模型 Qwen3-4B（2.3GB）</b></td><td>自动从魔搭 ModelScope 下载，断点续传</td><td>首次运行自动</td></tr>
+      <tr><td><span class="n">4</span></td><td>游戏服务 + 网页前端</td><td>FastAPI 起在 127.0.0.1:7860，浏览器自动打开</td><td>每次双击自动</td></tr>
+      <tr><td><span class="n">5</span></td><td>一键启动脚本 启动游戏.bat</td><td>检测模型 → 拉起推理 → 拉起游戏 → 开浏览器</td><td>用户双击</td></tr>
+      <tr><td><span class="n">6</span></td><td>Token 钱包与积分存档</td><td>wallet.json 自动创建 / 读写 / 持久化</td><td>首局自动</td></tr>
+    </table>
+    <div class="tip">💡 想直接玩？下载整合包，解压后双击「启动游戏.bat」即可（模型首次启动自动下载）。<br>
+      <a class="dl" href="dist/%E6%AC%A2%E4%B9%90%E6%96%97%E5%9C%B0%E4%B8%BBAI%E7%89%88_%E5%85%8D%E5%AE%89%E8%A3%85%E6%95%B4%E5%90%88%E5%8C%85.zip">⬇ 一键下载整合包（50 MB）</a></div>
+  </div>
+
+  <h2>调用了哪些 Skill</h2>
+  <div class="card">
+    <p style="color:var(--muted);margin-bottom:12px">本项目由 WorkBuddy AI 助手端到端开发，过程中调用并遵循了以下 Skill 的工程规范：</p>
+    <table>
+      <tr><th>Skill</th><th>在本项目中的作用</th></tr>
+      <tr>
+        <td><b>dev-expert</b><br><span style="color:var(--muted);font-size:12.5px">编程专家</span></td>
+        <td>总体工程纪律：规则引擎的根因式调试（如对局卡死 → 定位到 logging 未导入导致的静默线程死亡链）、FastAPI 分层架构、端到端测试策略（300 局引擎压测 + 3 局全座位 API 回归）、错误码规范（非法出牌 400 / 无效会话 404）。</td>
+      </tr>
+      <tr>
+        <td><b>frontend-ui-engineering</b><br><span style="color:var(--muted);font-size:12.5px">前端 UI 工程</span></td>
+        <td>前端重做：真实扑克牌面与毡布牌桌的组件化样式、手牌扇形布局与选牌交互、结算弹窗与侧栏对局记录、键盘可访问性（Enter 出牌 / P 不要 / H 提示）、响应式适配。</td>
+      </tr>
+    </table>
+  </div>
+
+  <h2>项目结构</h2>
+  <div class="card"><pre>doudizhu/
+├── server.py            # FastAPI 游戏服务（会话 / AI 轮次调度 / 钱包结算）
+├── game/
+│   ├── cards.py         # 斗地主规则引擎：牌型识别、比较、合法出牌枚举
+│   ├── engine.py        # 游戏状态机：发牌、叫分、出牌、结算、春天判定
+│   ├── ai.py            # LLM + 规则混合 AI：候选构造、JSON 解析、启发式兜底
+│   └── wallet.py        # Token 钱包：余额持久化、结算、历史记录
+├── static/              # 网页前端（原生 HTML/CSS/JS，无框架）
+├── e2e_test.py          # 端到端测试：拉起服务打完整对局 + 非法输入校验
+├── test_engine.py       # 引擎压测：300 局随机种子对局
+├── dist/                # 免安装整合包（zip，一键下载即玩）
+└── README.html          # 本页面</pre></div>
+
+  <h2>本地开发运行</h2>
+  <div class="card"><pre># 1. 安装依赖
+pip install fastapi "uvicorn[standard]" requests
+
+# 2. 启动 AI 推理服务（可选，不起则用启发式 AI）
+llama-server.exe -m Qwen3-4B-Q4_K_M.gguf --port 8000 -ngl 99 --no-warmup --jinja
+
+# 3. 启动游戏
+python server.py --port 7860
+
+# 4. 浏览器打开 http://127.0.0.1:7860</pre></div>
+
+  <h2>技术要点</h2>
+  <div class="card">
+    <ul class="feat">
+      <li><b>架构</b>：前端（原生 JS 轮询状态）↔ FastAPI（会话 + 状态机）↔ llama.cpp（OpenAI 兼容 /v1 接口）</li>
+      <li><b>AI 决策</b>：规则引擎枚举合法牌型 → 构造候选 prompt → 模型输出 JSON <code>{"play": 编号, "say": "骚话"}</code> → 代码校验 + 启发式兜底</li>
+      <li><b>量化</b>：Qwen3-4B Q4_K_M（2.3GB），6GB 显存可全量 offload</li>
+    </ul>
+  </div>
+
+  <footer>仅供学习交流 · Qwen3 模型遵循 Apache-2.0（阿里云通义）</footer>
+</div>
+</body>
+</html>

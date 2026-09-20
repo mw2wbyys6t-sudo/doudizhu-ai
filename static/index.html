@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>欢乐斗地主 · 本地AI版</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ============ 顶栏 ============ -->
+  <header class="topbar">
+    <div class="brand">欢乐斗地主<span class="ver">本地AI</span></div>
+
+    <div class="scoreboard" role="status" aria-label="对局信息">
+      <div class="sb-item"><label>底注</label><b id="sb-stake">—</b></div>
+      <div class="sb-item"><label>叫分</label><b id="sb-base">—</b></div>
+      <div class="sb-item"><label>倍数</label><b id="sb-mult" class="mult">x1</b></div>
+      <div class="sb-item"><label>本局注额</label><b id="sb-pot">—</b></div>
+    </div>
+
+    <div class="topright">
+      <div class="wallet" id="wallet-box" aria-label="token 余额">
+        <span class="wallet-icon" aria-hidden="true">◆</span>
+        <b id="wallet-balance">10,000</b>
+        <span class="wallet-unit">token</span>
+      </div>
+      <span id="ai-badge" class="badge badge-off">检测中</span>
+      <button id="btn-settings" class="icon-btn" aria-label="打开记录与设置">☰</button>
+      <button id="btn-new" class="btn btn-gold btn-sm">新局</button>
+    </div>
+  </header>
+
+  <!-- LLM 掉线警示条 -->
+  <div id="llm-banner" class="llm-banner" hidden role="alert">
+    <span>⚠ 大模型未连接 — AI 暂用规则兜底出牌，游戏可正常进行。</span>
+    <span class="llm-banner-sub">请先运行「启动模型服务.bat」（127.0.0.1:8000）</span>
+  </div>
+
+  <!-- ============ 主区域: 牌桌 + 侧栏 ============ -->
+  <div class="layout">
+
+    <main class="table-wrap">
+    <div class="table-felt">
+
+      <!-- 底牌 -->
+      <div class="bottom-cards">
+        <span class="bc-label">底牌</span>
+        <div id="bottom-area" class="bc-cards"></div>
+      </div>
+
+      <!-- 上家（左） -->
+      <section class="seat seat-left" id="seat-2">
+        <div class="avatar-box">
+          <div class="avatar" aria-hidden="true">张</div>
+          <div class="pname">电脑·老张</div>
+          <div class="pcount"><b>17</b> 张</div>
+          <div class="role-tag" hidden>地主</div>
+          <div class="thinking-dots" hidden aria-label="思考中"><i></i><i></i><i></i></div>
+        </div>
+        <div class="seat-play" id="play-2"></div>
+        <div class="bubble" id="bubble-2" hidden></div>
+      </section>
+
+      <!-- 下家（右） -->
+      <section class="seat seat-right" id="seat-1">
+        <div class="avatar-box">
+          <div class="avatar" aria-hidden="true">美</div>
+          <div class="pname">电脑·小美</div>
+          <div class="pcount"><b>17</b> 张</div>
+          <div class="role-tag" hidden>地主</div>
+          <div class="thinking-dots" hidden aria-label="思考中"><i></i><i></i><i></i></div>
+        </div>
+        <div class="seat-play" id="play-1"></div>
+        <div class="bubble" id="bubble-1" hidden></div>
+      </section>
+
+      <!-- 中央信息 -->
+      <div class="center-info">
+        <div id="center-msg" class="center-msg">选择底注后开始游戏</div>
+        <div id="turn-tip" class="turn-tip" hidden></div>
+      </div>
+
+      <!-- 我的出牌区 -->
+      <div class="my-play-area">
+        <div class="my-play" id="play-0"></div>
+      </div>
+    </div>
+
+    <!-- ============ 我的手牌 ============ -->
+    <div class="my-zone">
+      <div class="me-bar">
+        <div class="avatar small" aria-hidden="true">我</div>
+        <div class="me-info">
+          <span class="pname">你</span>
+          <span class="role-tag" id="my-role" hidden>地主</span>
+          <span class="pcount"><b id="my-count">17</b> 张</span>
+        </div>
+        <span class="kbd-hint" aria-hidden="true">Enter 出牌 · P 不要 · H 提示</span>
+      </div>
+
+      <div id="hand" class="hand" role="listbox" aria-label="手牌"></div>
+
+      <div class="actions" id="actions"></div>
+    </div>
+    </main>
+
+    <!-- ============ 侧栏日志 ============ -->
+    <aside class="sidebar" id="sidebar" aria-label="对局记录">
+    <div class="side-head">
+      <span>对局记录</span>
+      <button id="btn-toggle-side" class="icon-btn tiny" aria-label="关闭记录面板">×</button>
+    </div>
+    <div id="log" class="log-list"></div>
+    <div class="side-foot">
+      <label class="switch"><input type="checkbox" id="opt-llm" checked><span>大模型决策</span></label>
+      <label class="switch"><input type="checkbox" id="opt-say" checked><span>AI 说骚话</span></label>
+      <button id="btn-wallet-reset" class="btn btn-grey btn-sm">重置钱包</button>
+    </div>
+    <div class="side-history">
+      <span class="his-title">最近结算</span>
+      <div id="history" class="his-list"></div>
+    </div>
+  </aside>
+  </div>
+  <button id="btn-show-side" class="side-toggle" hidden>记录</button>
+</div>
+
+<!-- ============ 结算弹窗 ============ -->
+<div class="modal-mask" id="result-mask" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="result-title">
+    <div class="result-title" id="result-title">对局结束</div>
+    <div class="result-sub" id="result-sub"></div>
+
+    <div class="token-delta" id="token-delta"></div>
+
+    <table class="result-table">
+      <thead><tr><th>玩家</th><th>身份</th><th>token</th></tr></thead>
+      <tbody id="result-body"></tbody>
+    </table>
+
+    <div class="result-balance" id="result-balance"></div>
+
+    <div class="modal-actions">
+      <button id="btn-again" class="btn btn-gold btn-lg">再来一局</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 开始遮罩 ============ -->
+<div class="modal-mask" id="start-mask">
+  <div class="modal start-modal" role="dialog" aria-modal="true" aria-labelledby="start-logo">
+    <div class="start-logo" id="start-logo">欢乐斗地主</div>
+    <div class="start-sub">本地大模型 AI 对战 · Qwen3-4B + llama.cpp</div>
+
+    <div class="stake-picker" role="radiogroup" aria-label="选择底注">
+      <span class="stake-label">本局底注（token）</span>
+      <div class="stake-opts" id="stake-opts"></div>
+      <span class="stake-note">地主最多输 2×底注 · 炸弹与春天令倍数翻倍</span>
+    </div>
+
+    <ul class="start-tips">
+      <li>出牌合法性由规则引擎保证，AI 只在合法候选中决策</li>
+      <li>全部 AI 由本地大模型驱动，掉线时自动规则兜底</li>
+      <li>模型每次思考约 1~3 秒（RTX 2060 实测）</li>
+    </ul>
+    <div id="start-status" class="start-status" role="status"></div>
+    <button id="btn-start" class="btn btn-gold btn-lg">开始游戏</button>
+  </div>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# 运行时数据(每人本地不同)
+wallet.json
+*.log
+_s*.log
+_e2e*.log
+
+# 大文件与模型(整合包里已含, 或首次运行自动下载)
+model/
+*.gguf
+runtime/
+
+# IDE
+.idea/
+.vscode/
