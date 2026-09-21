@@ -1,0 +1,20 @@
+{
+  "name": "Skill安全审计（云鼎实验室）",
+  "installedAt": 1789981315131,
+  "source": "marketplace",
+  "version": "1.0.0",
+  "skillId": "skill_2053082711420960768",
+  "examples_zh": [
+    "对这个社区技能做安全审计",
+    "检查技能里是否有敏感信息泄漏风险",
+    "审计技能的网络访问权限"
+  ],
+  "examples_en": [
+    "Audit this community skill for security issues",
+    "Check for sensitive data leak risks in the skill",
+    "Review the network access permissions"
+  ],
+  "iconSource": "https://openplatform-cdn.codebuddy.cn/public/skills/icons/skills-security-check.svg",
+  "iconLocalPath": "C:\\Users\\Administrator\\.workbuddy\\skills\\skill_2053082711420960768\\_icon.svg",
+  "iconDownloadedFrom": "https://openplatform-cdn.codebuddy.cn/public/skills/icons/skills-security-check.svg"
+}

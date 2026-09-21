@@ -49,7 +49,45 @@ python tools/autocommit.py --verbose        # 打印每一次检测到的变动
   确实想让它也自动提交，就加 `--include-dist`。
 - `runtime/`、`model/`、`*.gguf`、`__pycache__/`、`*.pyc`、`*.log`（沿用 `.gitignore`）
 
-## 安全边界（刻意不做的事）
+## 打包发行（`tools/pack_release.py`）
+
+重新生成免安装整合包并**校验必需条目**，可重复执行：
+
+```bash
+python tools/pack_release.py            # 打包到默认位置 + 校验
+python tools/pack_release.py --check    # 只检查已有 zip（含 zip 完整性）
+python tools/pack_release.py --src <发行暂存目录> --out <产物.zip>
+```
+
+默认路径按脚本位置自动推导，不写死盘符：
+
+| 项 | 默认值 |
+|---|---|
+| 源（发行暂存目录） | `<仓库同级>/release/欢乐斗地主AI版` |
+| 产物 | `<仓库同级>/release/欢乐斗地主AI版_免安装整合包.zip` 与 `<仓库>/dist/欢乐斗地主AI版_免安装整合包.zip` |
+
+校验内容：12 项必需条目（启动脚本、`runtime/local_agent.py`、`skills/index.json` 等）+ `zipfile.testzip()`
+完整性。**少一项或压缩包损坏就返回非 0**，适合接进 CI。
+
+> ⚠️ 若 README 挂了 `dist/*.zip` 的在线下载链接，发布后必须手动提交一次该 zip，
+> 否则用户点击下载拿到的是**旧包**（不报错，但功能缺失）。
+> 对照命令：`git cat-file -s HEAD:dist/xxx.zip` 与 `ls -l dist/xxx.zip` 字节数应一致。
+
+## 随仓库分发的技能包（`.workbuddy/skills/`）
+
+4 个技能随仓库一起版本化，供 WorkBuddy 直接读取（项目级技能目录）：
+
+| 技能 | 类型 | 说明 |
+|---|---|---|
+| `superpowers` | 文档型 | 工程方法论：规格 → 计划 → 红绿 TDD → 评审 |
+| `web-design-engineer` | 文档型 | 前端/视觉：页面、仪表盘、原型、动效 |
+| `taptap-maker` | 工具型 | 游戏项目工作流（需 Node 环境） |
+| `skills-security-check` | 文档型 | 安装第三方技能前的安全审计 |
+
+同一份技能也已打进整合包的 `skills/`，最终用户解压即得；仓库里这份是给开发/协作侧用的。
+安全审计结论见 `../skill_audit_report_2026-09-21.md`（均 Benign，无硬编码凭据）。
+
+
 
 - **绝不 force push**，绝不自动合并冲突。推送被拒（远端有新提交）只报告，由你处理。
 - **合并/变基/拣选进行中不提交**，索引被 `.git/index.lock` 占用时等待。

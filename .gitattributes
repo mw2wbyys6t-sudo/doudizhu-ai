@@ -1,0 +1,32 @@
+# 统一行尾，避免跨机器协作时把脚本改坏
+# 规则：仓库内一律存 LF；只在检出到 Windows 时把批处理换成 CRLF。
+
+# 默认：交给 git 判断文本/二进制，文本统一存 LF
+* text=auto
+
+# ---- Windows 批处理：必须是 CRLF，否则 cmd.exe 解析 goto/label 会出错 ----
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# ---- Unix shell 脚本：必须是 LF，CRLF 会让 sh 直接报错 ----
+*.sh text eol=lf
+.githooks/* text eol=lf
+.workbuddy/skills/taptap-maker/bin/run-node      text eol=lf
+.workbuddy/skills/taptap-maker/bin/taptap-maker  text eol=lf
+
+# ---- 二进制：禁止任何行尾转换 ----
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.svg  text
+*.zip  binary
+*.gguf binary
+*.exe  binary
+*.dll  binary
+*.pyd  binary
+
+# ---- 语言统计：把技能目录和整合包产物排除，免得 stats 被第三方代码淹没 ----
+.workbuddy/skills/** linguist-vendored
+dist/**              linguist-generated
