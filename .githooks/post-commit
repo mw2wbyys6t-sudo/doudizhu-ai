@@ -1,0 +1,61 @@
+#!/bin/sh
+# post-commit 钩子 —— 每次 commit 之后，自动把当前分支推送到所有远端
+#
+# 启用：python tools/autocommit.py --install-hooks
+# 临时跳过：SKIP_AUTOPUSH=1 git commit -m "..."
+# 关闭代理兜底：AUTOPUSH_NO_PROXY=1
+#
+# 设计原则：绝不 force push；推送失败只写日志，绝不让 commit 失败。
+
+[ -n "$SKIP_AUTOPUSH" ] && exit 0
+
+TOP="$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
+BRANCH="$(git symbolic-ref --short -q HEAD 2>/dev/null)" || exit 0
+[ -z "$BRANCH" ] && exit 0
+
+LOG="$TOP/tools/autocommit.log"
+GITDIR="$(git rev-parse --git-dir 2>/dev/null)"
+LOCK="$GITDIR/autopush.lock"
+
+mkdir "$LOCK" 2>/dev/null || exit 0
+trap 'rmdir "$LOCK" 2>/dev/null' 0 1 2 15
+
+find_proxy() {
+    for p in 7897 7890 10809 10808 7891; do
+        if (exec 3<>/dev/tcp/127.0.0.1/$p) 2>/dev/null; then
+            exec 3<&- 2>/dev/null
+            echo "http://127.0.0.1:$p"
+            return 0
+        fi
+    done
+    return 1
+}
+
+for remote in $(git remote); do
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] post-commit → $remote $BRANCH" >>"$LOG"
+
+    out=$(env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY -u ALL_PROXY \
+              GIT_TERMINAL_PROMPT=0 git push "$remote" "HEAD:$BRANCH" 2>&1)
+    rc=$?
+
+    if [ $rc -ne 0 ] && [ -z "$AUTOPUSH_NO_PROXY" ]; then
+        PROXY="$(find_proxy)"
+        if [ -n "$PROXY" ]; then
+            out=$(env -u ALL_PROXY http_proxy="$PROXY" https_proxy="$PROXY" \
+                      GIT_TERMINAL_PROMPT=0 git push "$remote" "HEAD:$BRANCH" 2>&1)
+            rc=$?
+            [ $rc -eq 0 ] && out="(经代理 $PROXY) $out"
+        fi
+    fi
+
+    printf '%s\n' "$out" | sed 's/^/    /' >>"$LOG"
+    if [ $rc -eq 0 ]; then
+        echo "    [OK]" >>"$LOG"
+        echo "  [自动推送] $remote 已同步"
+    else
+        echo "    [失败 退出码 $rc]" >>"$LOG"
+        echo "  [自动推送] $remote 失败（详见 tools/autocommit.log）—— 代码已安全提交在本地"
+    fi
+done
+
+exit 0
