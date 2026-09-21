@@ -17,10 +17,14 @@ from __future__ import annotations
 import argparse
 import logging
 import os
+import sys
 import threading
 import time
 import uuid
 from typing import Dict, Optional
+
+# 内嵌 Python(隔离模式)不会自动加入脚本目录, 手动补上
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse, JSONResponse
